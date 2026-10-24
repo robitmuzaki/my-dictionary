@@ -14,7 +14,7 @@ function App() {
     setErrorMessage('');
     setResultData('');
     setHasSearched(true);
-    axios.get(`/api/v2/entries/en/${encodeURIComponent(searchText.current.trim())}`)
+    axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(searchText.current.trim())}`)
       .then(response => {
         setResultData(response.data);
         setIsLoading(false);
