@@ -9,21 +9,18 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
-  const handleSearchCLick = async () => {
+  function handleSearchCLick() {
     setIsLoading(true);
     setErrorMessage('');
     setResultData('');
     setHasSearched(true);
-    const word = searchText.current.trim();
-    if (!word) return;
-
-    try {
-      const response = await axios.get("/.netlify/functions/dictionary", {
-        params: { word },
-      });
-
-      setResultData(response.data);
-    } catch (error) {
+    axios.get(`https://freedictionaryapi.com/api/v1/entries/en/${encodeURIComponent(searchText.current.trim())}`)
+      .then(response => {
+        setResultData(response.data);
+        setIsLoading(false);
+      })
+      .catch(error => {
+        setIsLoading(false);
         if (error.response?.status === 530) {
           setErrorMessage("No definition found for that word.");
         } else if (error.response?.status === 404) {
@@ -35,9 +32,7 @@ function App() {
         } else {
           setErrorMessage("Something went wrong while looking up that word.");
         }
-    } finally {
-      setIsLoading(false);
-    }
+      });
   }
 
   return (
@@ -60,13 +55,13 @@ function App() {
           <FaSpinner className='spinner' />
         ) : resultData && (
           <>
-            <h2>{resultData[0]?.word || 'Word not found'}</h2>
+            <h2>{resultData?.word || 'Word not found'}</h2>
             <h3>Part of Speech: </h3>
-            <p>{resultData[0]?.meanings[0]?.partOfSpeech || 'Not available'}</p>
+            <p>{resultData?.entries[0]?.partOfSpeech || 'Not available'}</p>
             <h3>Definition: </h3>
-            <p>{resultData[0]?.meanings[0]?.definitions[0]?.definition || 'Not available'}</p>
+            <p>{resultData?.entries[0]?.senses[0]?.definition || 'Not available'}</p>
             <h3>Example: </h3>
-            <p>{resultData[0]?.meanings[0]?.definitions[0]?.example || 'Not available'}</p>
+            <p>{resultData?.entries[0]?.senses[0]?.examples || 'Not available'}</p>
           </>
         )}
         {errorMessage && <p role="alert">{errorMessage}</p>}
