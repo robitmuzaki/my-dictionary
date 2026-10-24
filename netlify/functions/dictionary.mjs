@@ -12,7 +12,8 @@ export default async (request) => {
 
     const response = await fetch(apiUrl);
     const body = await response.text();
-
+    console.log("Dictionary API status:", response.status);
+    console.log("Dictionary API response:", body);
     return new Response(body, {
       status: response.status,
       headers: {
